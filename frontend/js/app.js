@@ -95,7 +95,14 @@ const historyList = document.getElementById('history-list');
 const historyEmpty = document.getElementById('history-empty');
 
 async function renderHistory() {
-  const rows = await fetchHistory();
+  let rows;
+  try {
+    rows = await fetchHistory();
+  } catch (err) {
+    console.error('Could not load conversion history:', err.message);
+    return;
+  }
+
   historyList.innerHTML = '';
   historyEmpty.hidden = rows.length > 0;
 
@@ -108,6 +115,11 @@ async function renderHistory() {
 }
 
 document.getElementById('clear-history').addEventListener('click', async () => {
-  await clearHistory();
+  try {
+    await clearHistory();
+  } catch (err) {
+    console.error('Could not clear conversion history:', err.message);
+    return;
+  }
   await renderHistory();
 });
