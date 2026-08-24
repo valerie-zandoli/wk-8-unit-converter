@@ -61,6 +61,7 @@ function renderAuthState(user) {
 authForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   authError.textContent = '';
+  passwordInput.autocomplete = 'current-password';
   try {
     await signIn(emailInput.value, passwordInput.value);
   } catch (err) {
@@ -70,6 +71,7 @@ authForm.addEventListener('submit', async (event) => {
 
 document.getElementById('sign-up').addEventListener('click', async () => {
   authError.textContent = '';
+  passwordInput.autocomplete = 'new-password';
   if (!emailInput.checkValidity() || !passwordInput.checkValidity()) {
     authError.textContent = 'Enter a valid email and a password of at least 6 characters.';
     return;
