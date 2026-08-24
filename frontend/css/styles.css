@@ -7,8 +7,11 @@
   --label: #444444;
   --border: #cccccc;
   --accent: #4a7dfc;
-  --accent-hover: #3a6ae0;
   --accent-ring: rgba(74, 125, 252, 0.15);
+  /* Deliberately not re-themed for dark mode: white-on-this-fill must stay >=4.5:1 in both
+     themes, which #4a7dfc (the focus-ring accent) does not manage on its own. */
+  --button-bg: #3a63c9;
+  --button-bg-hover: #2e4fa3;
   --error: #d33333;
   --btn-secondary-bg: #eef0f4;
   --btn-secondary-hover: #dee1e8;
@@ -27,7 +30,6 @@
     --label: #c3c8cd;
     --border: #3a3f46;
     --accent: #5c8dff;
-    --accent-hover: #4a7dfc;
     --accent-ring: rgba(92, 141, 255, 0.25);
     --error: #ff6b6b;
     --btn-secondary-bg: #262b32;
@@ -134,12 +136,12 @@ button {
 button#convert {
   width: 100%;
   margin-top: 0.5rem;
-  background: var(--accent);
+  background: var(--button-bg);
   color: white;
 }
 
 button#convert:hover {
-  background: var(--accent-hover);
+  background: var(--button-bg-hover);
 }
 
 button.secondary {
