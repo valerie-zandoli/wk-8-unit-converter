@@ -2,6 +2,10 @@
 
 A small, full-stack unit converter built for the Week 8 Technical Assessment.
 
+- **Live app:** https://frontend-flame-eta-34.vercel.app
+- **Repo:** https://github.com/valerie-zandoli/wk-8-unit-converter (connected to Vercel — pushes
+  to `main` redeploy automatically)
+
 - **Frontend:** plain HTML, CSS, and JavaScript (no framework, no build tool required to run it
   locally) — deployed to **Vercel**. Works on desktop and mobile browsers via responsive design.
 - **Backend / data layer:** **Supabase** (managed **Postgres**) for auth and for storing each
