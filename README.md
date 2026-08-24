@@ -23,21 +23,27 @@ private history of your conversions, which is the one feature that actually need
 wk-8/
 ├── frontend/              Everything deployed to Vercel
 │   ├── index.html         The whole app UI (converter + auth + history)
-│   ├── css/styles.css     Responsive, mobile-first styling
+│   ├── css/styles.css     Responsive, mobile-first styling, light + dark
 │   ├── js/
 │   │   ├── converter.js       Pure conversion + validation logic (no DOM — unit tested)
+│   │   ├── authErrors.js      Pure mapping of Supabase error strings to plain copy (unit tested)
 │   │   ├── supabaseClient.js  Creates the Supabase client
 │   │   ├── auth.js            Sign up / sign in / sign out
-│   │   ├── history.js         Save / fetch / clear a user's conversion history
+│   │   ├── history.js         Save / fetch / delete-one / clear-all a user's conversion history
 │   │   ├── app.js             Wires the above to the page
 │   │   └── config.example.js  Template — copy to config.js locally, never commit config.js
 │   ├── build.js            Generates js/config.js from env vars at deploy time (Vercel)
-│   └── vercel.json
+│   └── vercel.json         Build config + CSP/security headers
 ├── backend/
-│   ├── supabase/migrations/0001_init_conversions.sql   The `conversions` table + RLS policies
+│   ├── supabase/migrations/
+│   │   ├── 0001_init_conversions.sql        The `conversions` table + RLS policies
+│   │   └── 0002_verify_conversion_math.sql  DB-side check that output_value is really correct
 │   └── README.md            Supabase setup steps
 ├── tests/
-│   └── converter.test.js    Dependency-free tests for the conversion logic
+│   ├── converter.test.js      Tests for the conversion logic
+│   └── authErrors.test.js     Tests for the error-message mapping
+├── .github/workflows/test.yml   Runs the test suite on every push and PR
+├── LICENSE                  MIT
 ├── .env.example
 └── .gitignore
 ```
@@ -51,12 +57,12 @@ other installs are required — the frontend has zero npm dependencies.
    ```bash
    npm test
    ```
-   You should see 9 passing tests.
+   You should see 11 passing tests.
 
 2. **Set up Supabase** (5 minutes) — full details in [`backend/README.md`](backend/README.md):
    - Create a free project at [supabase.com](https://supabase.com/dashboard).
-   - In the SQL Editor, run the contents of
-     `backend/supabase/migrations/0001_init_conversions.sql`.
+   - In the SQL Editor, run **both** files in `backend/supabase/migrations/`, in order
+     (`0001_init_conversions.sql`, then `0002_verify_conversion_math.sql`).
    - Copy your **Project URL** and the **anon** key from the **Legacy anon, service_role API
      keys** tab under Settings → API Keys (not the newer "Publishable" key — see
      [`backend/README.md`](backend/README.md) for why).
@@ -99,24 +105,36 @@ other installs are required — the frontend has zero npm dependencies.
   additive layer on top, not a blocker to the core feature.
 - **Validation:** empty, non-numeric, negative, and infinite input are all rejected client-side
   with an inline error message (see `converter.js` → `validateInput`, covered by
-  `tests/converter.test.js`). The database also enforces valid units and non-negative values via
-  `CHECK` constraints as a second layer of defense.
+  `tests/converter.test.js`). The database enforces the same rules again independently via
+  `CHECK` constraints (valid units, non-negative values, and — via migration `0002` — that
+  `output_value` is actually the correct conversion of `input_value`, not just any number).
 - **Privacy / access control:** Postgres Row Level Security policies on the `conversions` table
   mean a user can only ever `select`/`insert`/`delete` rows where `user_id` matches their own
-  authenticated ID — enforced by the database itself, not just app code.
+  authenticated ID — enforced by the database itself, not just app code. Verified directly
+  against the live API with the anon key and no session: reads return `[]`, writes return `401`.
 - **No secrets in the repo:** the Supabase anon key is loaded from environment variables at
   Vercel build time, never committed. The Supabase `service_role` key (which *would* be a real
   secret) isn't used anywhere in this project.
-- **Testing:** `tests/converter.test.js` covers empty/invalid/negative input, both conversion
-  directions against known reference values, and a round-trip sanity check.
-- **Mobile:** the layout is a single responsive column with ≥44px touch targets and a viewport
-  meta tag — it's a responsive web app rather than a separate native app, so the exact same code
-  serves both desktop and mobile browsers.
+- **Security headers:** the live site sends a `Content-Security-Policy` scoped to exactly what
+  the app needs, plus `X-Frame-Options`, `X-Content-Type-Options`, a referrer policy, and a
+  permissions policy (see `frontend/vercel.json`).
+- **Testing:** `tests/converter.test.js` and `tests/authErrors.test.js` — 11 tests covering
+  empty/invalid/negative input, both conversion directions against known reference values, a
+  round-trip sanity check, and every mapped auth-error string plus the unmapped fallback. A
+  GitHub Actions workflow runs the suite on every push and PR.
+- **Mobile + dark mode:** the layout is a single responsive column with ≥44px touch targets and a
+  viewport meta tag — a responsive web app rather than a separate native app, so the exact same
+  code serves both desktop and mobile browsers. Colors follow the system's light/dark preference
+  via `prefers-color-scheme`, with `color-scheme` declared so native form controls follow suit.
+- **History management:** signed-in users can delete a single conversion or clear all of them;
+  both actions are RLS-scoped so a user can only ever affect their own rows.
 
 ## 5. Known scope limits (being upfront about what an MVP leaves out)
 
-- No password reset flow, no rate limiting on auth attempts — fine for an assessment, worth
-  adding before any real users.
+- No password reset flow. Auth attempts *are* rate-limited, but only by Supabase's own platform
+  defaults (a few auth emails per hour on the free tier, 30 sign-up/sign-in requests per 5 minutes
+  per IP) — there's no custom app-level throttling on top of that.
 - History is capped at the 50 most recent conversions and has no pagination.
-- No automated end-to-end (browser) test suite — `tests/converter.test.js` covers the pure logic;
-  the auth/history flows were verified manually against a live Supabase project.
+- No automated end-to-end (browser) test suite — `tests/converter.test.js` and
+  `tests/authErrors.test.js` cover the pure logic; the auth/history flows were verified manually,
+  repeatedly, against a live Supabase project.
