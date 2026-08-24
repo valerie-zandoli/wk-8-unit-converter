@@ -1,16 +1,7 @@
 import { validateInput, convert } from './converter.js';
 import { signUp, signIn, signOut, getCurrentUser, onAuthChange } from './auth.js';
 import { saveConversion, fetchHistory, clearHistory, deleteConversion } from './history.js';
-
-const AUTH_ERROR_MESSAGES = {
-  'email rate limit exceeded': "Too many sign-up emails sent recently — please try again in a bit.",
-  'Invalid login credentials': 'That email and password combination doesn’t match an account.',
-  'User already registered': 'An account with that email already exists — try signing in instead.',
-};
-
-function friendlyAuthError(err) {
-  return AUTH_ERROR_MESSAGES[err.message] ?? err.message;
-}
+import { friendlyAuthError } from './authErrors.js';
 
 // ---- Converter ----
 
