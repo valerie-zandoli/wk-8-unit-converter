@@ -95,7 +95,11 @@ document.getElementById('sign-up').addEventListener('click', async () => {
 });
 
 document.getElementById('sign-out').addEventListener('click', async () => {
-  await signOut();
+  try {
+    await signOut();
+  } catch (err) {
+    console.error('Could not sign out:', err.message);
+  }
 });
 
 onAuthChange(renderAuthState);
