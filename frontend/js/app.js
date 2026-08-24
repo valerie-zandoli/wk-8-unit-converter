@@ -1,6 +1,16 @@
 import { validateInput, convert } from './converter.js';
 import { signUp, signIn, signOut, getCurrentUser, onAuthChange } from './auth.js';
-import { saveConversion, fetchHistory, clearHistory } from './history.js';
+import { saveConversion, fetchHistory, clearHistory, deleteConversion } from './history.js';
+
+const AUTH_ERROR_MESSAGES = {
+  'email rate limit exceeded': "Too many sign-up emails sent recently — please try again in a bit.",
+  'Invalid login credentials': 'That email and password combination doesn’t match an account.',
+  'User already registered': 'An account with that email already exists — try signing in instead.',
+};
+
+function friendlyAuthError(err) {
+  return AUTH_ERROR_MESSAGES[err.message] ?? err.message;
+}
 
 // ---- Converter ----
 
@@ -65,7 +75,7 @@ authForm.addEventListener('submit', async (event) => {
   try {
     await signIn(emailInput.value, passwordInput.value);
   } catch (err) {
-    authError.textContent = err.message;
+    authError.textContent = friendlyAuthError(err);
   }
 });
 
@@ -80,7 +90,7 @@ document.getElementById('sign-up').addEventListener('click', async () => {
     await signUp(emailInput.value, passwordInput.value);
     authError.textContent = 'Check your email to confirm your account, then sign in.';
   } catch (err) {
-    authError.textContent = err.message;
+    authError.textContent = friendlyAuthError(err);
   }
 });
 
@@ -110,11 +120,34 @@ async function renderHistory() {
 
   for (const row of rows) {
     const li = document.createElement('li');
+    li.dataset.id = row.id;
+
+    const text = document.createElement('span');
     const when = new Date(row.created_at).toLocaleString();
-    li.textContent = `${row.input_value} ${row.input_unit} = ${row.output_value} ${row.output_unit} — ${when}`;
+    text.textContent = `${row.input_value} ${row.input_unit} = ${row.output_value} ${row.output_unit} — ${when}`;
+
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'history-delete';
+    deleteButton.textContent = 'Delete';
+    deleteButton.setAttribute('aria-label', `Delete this conversion: ${text.textContent}`);
+
+    li.append(text, deleteButton);
     historyList.appendChild(li);
   }
 }
+
+historyList.addEventListener('click', async (event) => {
+  if (!event.target.classList.contains('history-delete')) return;
+  const id = event.target.closest('li').dataset.id;
+  try {
+    await deleteConversion(id);
+  } catch (err) {
+    console.error('Could not delete conversion:', err.message);
+    return;
+  }
+  await renderHistory();
+});
 
 document.getElementById('clear-history').addEventListener('click', async () => {
   try {

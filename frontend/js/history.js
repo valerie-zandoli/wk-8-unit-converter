@@ -40,3 +40,10 @@ export async function clearHistory() {
   const { error } = await supabase.from('conversions').delete().eq('user_id', user.id);
   if (error) throw error;
 }
+
+export async function deleteConversion(id) {
+  // RLS still scopes this to the signed-in user's own rows even without an explicit
+  // user_id filter here — deleting someone else's id is a no-op, not an error.
+  const { error } = await supabase.from('conversions').delete().eq('id', id);
+  if (error) throw error;
+}
