@@ -3,19 +3,23 @@
 This app uses [Supabase](https://supabase.com) as a Backend-as-a-Service: managed Postgres +
 authentication + row-level security. There is no separate Node/Express server — the frontend
 talks to Supabase directly using the public "anon" key, and Postgres itself enforces who can see
-what data (see `supabase/migrations/0001_init_conversions.sql`).
+what data (see `supabase/migrations/`).
 
 ## What's here
 
 - `supabase/migrations/0001_init_conversions.sql` — creates the `conversions` table (one row per
   saved conversion) and the Row Level Security (RLS) policies that guarantee a user can only
   select, insert, or delete **their own** rows.
+- `supabase/migrations/0002_verify_conversion_math.sql` — adds a `CHECK` constraint that
+  recomputes each row's conversion server-side, so a client can't write a fabricated
+  input/output pair. Run this one too — it's not optional.
 
 ## One-time setup
 
 1. Create a free project at [supabase.com](https://supabase.com/dashboard).
-2. In your new project, go to **SQL Editor** → **New query**, paste in the contents of
-   `supabase/migrations/0001_init_conversions.sql`, and click **Run**.
+2. In your new project, go to **SQL Editor** → **New query**, and run **both** migrations in
+   order: paste in `supabase/migrations/0001_init_conversions.sql` first and click **Run**, then
+   a **New query** again with `supabase/migrations/0002_verify_conversion_math.sql`.
 3. Go to **Project Settings → API Keys**. You'll need two values later for the frontend:
    - **Project URL** (e.g. `https://xxxxxxxx.supabase.co`)
    - The **anon** key from the **Legacy anon, service_role API keys** tab specifically (not the
