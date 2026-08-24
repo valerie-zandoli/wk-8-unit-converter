@@ -33,7 +33,8 @@ wk-8/
 │   │   ├── app.js             Wires the above to the page
 │   │   └── config.example.js  Template — copy to config.js locally, never commit config.js
 │   ├── build.js            Generates js/config.js from env vars at deploy time (Vercel)
-│   └── vercel.json         Build config + CSP/security headers
+│   └── vercel.json         Build config, CSP/security headers, and skips builds for changes
+│                           outside this directory
 ├── backend/
 │   ├── supabase/migrations/
 │   │   ├── 0001_init_conversions.sql        The `conversions` table + RLS policies
