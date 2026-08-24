@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.local
+.vercel
+.DS_Store
+
+# Generated at build time (or copied by hand locally) from js/config.example.js — never commit
+# real Supabase credentials, even though the anon key isn't a traditional "secret".
+frontend/js/config.js
