@@ -49,7 +49,7 @@ other installs are required — the frontend has zero npm dependencies.
 
 1. **Run the tests first**, to confirm the core conversion logic is correct on your machine:
    ```bash
-   node --test tests/
+   npm test
    ```
    You should see 9 passing tests.
 
@@ -57,7 +57,9 @@ other installs are required — the frontend has zero npm dependencies.
    - Create a free project at [supabase.com](https://supabase.com/dashboard).
    - In the SQL Editor, run the contents of
      `backend/supabase/migrations/0001_init_conversions.sql`.
-   - Copy your **Project URL** and **anon public key** from Settings → API.
+   - Copy your **Project URL** and the **anon** key from the **Legacy anon, service_role API
+     keys** tab under Settings → API Keys (not the newer "Publishable" key — see
+     [`backend/README.md`](backend/README.md) for why).
 
 3. **Configure the frontend locally**:
    ```bash
