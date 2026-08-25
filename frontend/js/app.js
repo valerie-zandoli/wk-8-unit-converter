@@ -145,6 +145,7 @@ historyList.addEventListener('click', async (event) => {
 });
 
 document.getElementById('clear-history').addEventListener('click', async () => {
+  if (!window.confirm('Clear your entire conversion history? This cannot be undone.')) return;
   try {
     await clearHistory();
   } catch (err) {
