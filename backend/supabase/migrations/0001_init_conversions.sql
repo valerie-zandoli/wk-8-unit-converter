@@ -21,14 +21,19 @@ create index if not exists conversions_user_id_created_at_idx
 -- Row Level Security: every user can only ever see or modify their own rows.
 alter table public.conversions enable row level security;
 
+-- Postgres has no `create policy if not exists`, so drop-then-create is the standard
+-- idempotent pattern: safe to run this migration again against an already-set-up database.
+drop policy if exists "select own conversions" on public.conversions;
 create policy "select own conversions"
   on public.conversions for select
   using (auth.uid() = user_id);
 
+drop policy if exists "insert own conversions" on public.conversions;
 create policy "insert own conversions"
   on public.conversions for insert
   with check (auth.uid() = user_id);
 
+drop policy if exists "delete own conversions" on public.conversions;
 create policy "delete own conversions"
   on public.conversions for delete
   using (auth.uid() = user_id);
