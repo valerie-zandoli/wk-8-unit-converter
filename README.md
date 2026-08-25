@@ -139,3 +139,7 @@ other installs are required — the frontend has zero npm dependencies.
 - No automated end-to-end (browser) test suite — `tests/converter.test.js` and
   `tests/authErrors.test.js` cover the pure logic; the auth/history flows were verified manually,
   repeatedly, against a live Supabase project.
+- `main` has no branch protection, so CI passing doesn't currently block anything from landing —
+  a deliberate choice for a solo-maintained repo where every change so far has been a direct push,
+  not an oversight. It's the first thing worth turning on if this ever moves to a workflow with
+  more than one contributor, since the CI check already exists and only needs to be required.
