@@ -99,6 +99,11 @@ other installs are required — the frontend has zero npm dependencies.
    `build.js` to generate `js/config.js` from those environment variables at build time — so
    the real values live only in Vercel's dashboard, never in the repo.
 6. Open the deployed URL on your phone to confirm the mobile layout.
+7. **Back in Supabase**, go to **Authentication → URL Configuration** and set **Site URL** to
+   your deployed URL (e.g. `https://your-project.vercel.app`). Every new Supabase project
+   defaults this to `http://localhost:3000` — skip this step and every sign-up confirmation
+   email will redirect a real user to a dead local address right after they confirm. (Their
+   account still confirms successfully either way; only the post-click redirect is affected.)
 
 ## 4. What's already covered
 
@@ -128,7 +133,11 @@ other installs are required — the frontend has zero npm dependencies.
   code serves both desktop and mobile browsers. Colors follow the system's light/dark preference
   via `prefers-color-scheme`, with `color-scheme` declared so native form controls follow suit.
 - **History management:** signed-in users can delete a single conversion or clear all of them;
-  both actions are RLS-scoped so a user can only ever affect their own rows.
+  both actions are RLS-scoped so a user can only ever affect their own rows. Clearing everything
+  asks for confirmation first, since it can't be undone. Screen reader users get a live
+  announcement whenever the list changes — an addition, a deletion, or a clear. If a save fails
+  (a dropped connection, for example), the app says so rather than the conversion just quietly
+  not showing up in history later.
 
 ## 5. Known scope limits (being upfront about what an MVP leaves out)
 
