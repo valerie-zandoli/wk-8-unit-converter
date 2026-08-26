@@ -10,6 +10,7 @@ const valueInput = document.getElementById('value');
 const valueError = document.getElementById('value-error');
 const directionSelect = document.getElementById('direction');
 const result = document.getElementById('result');
+const convertButton = document.getElementById('convert');
 
 converterForm.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -25,6 +26,10 @@ converterForm.addEventListener('submit', async (event) => {
   const { inputUnit, outputUnit, outputValue } = convert(check.value, directionSelect.value);
   result.textContent = `${check.value} ${inputUnit} = ${outputValue} ${outputUnit}`;
 
+  // The result above is instant, client-side math — only the history save below is async,
+  // so only that part needs to guard against a second click landing while it's in flight
+  // and quietly saving the same conversion twice.
+  convertButton.disabled = true;
   try {
     const saved = await saveConversion({
       inputValue: check.value,
@@ -38,6 +43,8 @@ converterForm.addEventListener('submit', async (event) => {
     // The result above is correct either way (it's pure client-side math), but signed-in
     // users need to know their history didn't get the row, not just see it silently missing.
     result.textContent += ' (not saved to your history — check your connection and try again)';
+  } finally {
+    convertButton.disabled = false;
   }
 });
 
