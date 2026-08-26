@@ -97,7 +97,7 @@ document.getElementById('sign-up').addEventListener('click', async () => {
   authError.textContent = '';
   passwordInput.autocomplete = 'new-password';
   if (!emailInput.checkValidity() || !passwordInput.checkValidity()) {
-    authError.textContent = 'Enter a valid email and a password of at least 6 characters.';
+    authError.textContent = 'Enter a valid email and a password of at least 8 characters.';
     return;
   }
   try {
