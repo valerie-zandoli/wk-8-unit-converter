@@ -43,7 +43,9 @@ wk-8/
 ├── tests/
 │   ├── converter.test.js      Tests for the conversion logic
 │   └── authErrors.test.js     Tests for the error-message mapping
-├── .github/workflows/test.yml   Runs the test suite on every push and PR
+├── .github/workflows/
+│   ├── test.yml             Runs the test suite on every push and PR
+│   └── codeql.yml           Static security analysis (CodeQL) on push, PR, and weekly
 ├── LICENSE                  MIT
 ├── .env.example
 └── .gitignore
@@ -124,6 +126,9 @@ other installs are required — the frontend has zero npm dependencies.
 - **Security headers:** the live site sends a `Content-Security-Policy` scoped to exactly what
   the app needs, plus `X-Frame-Options`, `X-Content-Type-Options`, a referrer policy, and a
   permissions policy (see `frontend/vercel.json`).
+- **Automated scanning:** GitHub secret scanning (with push protection) and Dependabot security
+  updates are both on, and CodeQL runs on every push, every PR, and weekly on a schedule (see
+  `.github/workflows/codeql.yml`).
 - **Testing:** `tests/converter.test.js` and `tests/authErrors.test.js` — 11 tests covering
   empty/invalid/negative input, both conversion directions against known reference values, a
   round-trip sanity check, and every mapped auth-error string plus the unmapped fallback. A
