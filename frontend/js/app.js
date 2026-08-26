@@ -53,6 +53,11 @@ function renderAuthState(user) {
   signedOutView.hidden = Boolean(user);
   signedInView.hidden = !user;
   historyCard.hidden = !user;
+  // Clear synchronously on every auth change, before the next renderHistory() fetch
+  // resolves — otherwise the previous user's rows sit in the DOM, visible, for the
+  // duration of that network round trip if a different user signs in right after.
+  historyList.innerHTML = '';
+  historyEmpty.hidden = true;
   if (user) {
     userEmailEl.textContent = user.email;
     renderHistory();
