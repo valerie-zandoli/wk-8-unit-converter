@@ -35,6 +35,9 @@ converterForm.addEventListener('submit', async (event) => {
     if (saved) await renderHistory();
   } catch (err) {
     console.error('Could not save conversion history:', err.message);
+    // The result above is correct either way (it's pure client-side math), but signed-in
+    // users need to know their history didn't get the row, not just see it silently missing.
+    result.textContent += ' (not saved to your history — check your connection and try again)';
   }
 });
 
