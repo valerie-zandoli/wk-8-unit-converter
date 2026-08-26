@@ -134,6 +134,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 button#convert {
   width: 100%;
   margin-top: 0.5rem;
