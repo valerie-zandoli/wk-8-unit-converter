@@ -47,6 +47,7 @@ wk-8/
 │   ├── test.yml             Runs the test suite on every push and PR
 │   └── codeql.yml           Static security analysis (CodeQL) on push, PR, and weekly
 ├── LICENSE                  MIT
+├── SECURITY.md              How to report a vulnerability
 ├── .env.example
 └── .gitignore
 ```
