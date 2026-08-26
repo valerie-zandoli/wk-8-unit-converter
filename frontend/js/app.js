@@ -49,19 +49,27 @@ const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const historyCard = document.getElementById('history-card');
 
+let currentUserId = null;
+
 function renderAuthState(user) {
   signedOutView.hidden = Boolean(user);
   signedInView.hidden = !user;
   historyCard.hidden = !user;
-  // Clear synchronously on every auth change, before the next renderHistory() fetch
-  // resolves — otherwise the previous user's rows sit in the DOM, visible, for the
-  // duration of that network round trip if a different user signs in right after.
+  if (user) userEmailEl.textContent = user.email;
+
+  // onAuthChange fires for more than sign-in/out — a background token refresh fires it
+  // too, with the same user. Only touch the history list when the signed-in user has
+  // actually changed, so a routine refresh doesn't flash the list empty for no reason.
+  const userId = user ? user.id : null;
+  if (userId === currentUserId) return;
+  currentUserId = userId;
+
+  // Clear synchronously here, before the next renderHistory() fetch resolves —
+  // otherwise the previous user's rows sit in the DOM, visible, for the duration of
+  // that network round trip if a different user signs in right after.
   historyList.innerHTML = '';
   historyEmpty.hidden = true;
-  if (user) {
-    userEmailEl.textContent = user.email;
-    renderHistory();
-  }
+  if (user) renderHistory();
 }
 
 authForm.addEventListener('submit', async (event) => {
