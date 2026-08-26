@@ -150,6 +150,10 @@ other installs are required — the frontend has zero npm dependencies.
 - No password reset flow. Auth attempts *are* rate-limited, but only by Supabase's own platform
   defaults (a few auth emails per hour on the free tier, 30 sign-up/sign-in requests per 5 minutes
   per IP) — there's no custom app-level throttling on top of that.
+- Passwords need at least 8 characters (enforced client-side; Supabase's own server-side minimum
+  is lower). Supabase's leaked-password check — rejecting passwords already found in known data
+  breaches — is a Pro-plan feature not available on this project's tier, so a weak-but-8-character
+  password (`password1`, for instance) isn't caught by anything.
 - History is capped at the 50 most recent conversions and has no pagination.
 - No automated end-to-end (browser) test suite — `tests/converter.test.js` and
   `tests/authErrors.test.js` cover the pure logic; the auth/history flows were verified manually,
